@@ -674,7 +674,6 @@
         }
 
         var startOffset = {};
-        var startTime = 0;
         var speed = {};
         var easingLoop = null;
         var inGlobalTouch = false;
@@ -714,12 +713,6 @@
             startOffset.pageX = touch.pageX;
             startOffset.pageY = touch.pageY;
 
-            startTime = (new Date()).getTime();
-
-            if (easingLoop !== null) {
-              clearInterval(easingLoop);
-            }
-
             e.stopPropagation();
           }
         }
@@ -735,15 +728,6 @@
             applyTouchMove(differenceX, differenceY);
             startOffset = currentOffset;
 
-            var currentTime = (new Date()).getTime();
-
-            var timeGap = currentTime - startTime;
-            if (timeGap > 0) {
-              speed.x = differenceX / timeGap;
-              speed.y = differenceY / timeGap;
-              startTime = currentTime;
-            }
-
             if (shouldPreventSwipe(differenceX, differenceY)) {
               e.stopPropagation();
               e.preventDefault();
@@ -753,24 +737,6 @@
         function touchEnd(e) {
           if (!inGlobalTouch && inLocalTouch) {
             inLocalTouch = false;
-
-            clearInterval(easingLoop);
-            easingLoop = setInterval(function () {
-              if (!isPluginAlive()) {
-                clearInterval(easingLoop);
-                return;
-              }
-
-              if (Math.abs(speed.x) < 0.01 && Math.abs(speed.y) < 0.01) {
-                clearInterval(easingLoop);
-                return;
-              }
-
-              applyTouchMove(speed.x * 30, speed.y * 30);
-
-              speed.x *= 0.8;
-              speed.y *= 0.8;
-            }, 10);
           }
         }
 
